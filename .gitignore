@@ -1,0 +1,11 @@
+# Local Environment
+.DS_Store
+.env
+.env.local
+
+# Dependencies
+node_modules/
+
+# Secrets (Important!)
+src/services/firebaseConfig.js
+src/services/supabaseConfig.js
