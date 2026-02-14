@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResQNet NGO Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body class="bg-gray-900 text-white">
+
+    <div id="root">
+        <nav class="p-4 bg-gray-800 border-b border-gray-700 flex justify-between">
+            <h1 class="text-2xl font-bold text-red-500">ResQNet Dashboard</h1>
+            <span class="text-gray-400">Jaipur, Rajasthan</span>
+        </nav>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 p-6">
+            <div id="map" class="lg:col-span-2 h-[500px] rounded-xl border border-gray-700"></div>
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                <h2 class="text-xl font-semibold mb-4 text-blue-400">AI Predictions</h2>
+                <div id="ai-stats" class="space-y-4">
+                    <div class="p-4 bg-gray-700 rounded-lg">
+                        <p class="text-sm text-gray-400">Required Ambulances</p>
+                        <p id="ambulance-count" class="text-3xl font-bold">--</p>
+                    </div>
+                    <div class="p-4 bg-gray-700 rounded-lg">
+                        <p class="text-sm text-gray-400">Required Fire Vans</p>
+                        <p id="firevan-count" class="text-3xl font-bold">--</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize Map centered on Jaipur
+        const map = L.map('map').setView([26.9124, 75.7873], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+        // Function to Fetch Data from your Render/Local Backend
+        async function updateDashboard() {
+            try {
+                // REPLACE WITH YOUR LIVE BACKEND URL LATER
+                const response = await fetch('http://localhost:5000/api/incidents');
+                const data = await response.json();
+                
+                // Update AI Counters
+                document.getElementById('ambulance-count').innerText = data.ai.ambulances;
+                document.getElementById('firevan-count').innerText = data.ai.fireVans;
+
+                // Add Pins to Map
+                data.reports.forEach(report => {
+                    L.marker([report.lat, report.lng]).addTo(map)
+                        .bindPopup(`<b>${report.type}</b><br>${report.status}`);
+                });
+            } catch (err) {
+                console.log("Connect your backend to see live data!");
+            }
+        }
+        updateDashboard();
+    </script>
+</body>
+</html>
